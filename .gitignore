@@ -1,2 +1,12 @@
-
+# === macOS system noise ===
 .DS_Store
+
+# === Terraform working dir (локальные состояния и кеш) ===
+infra/.terraform/
+infra/*.json
+
+# === Docker build cache ===
+backend/venv/
+backend/.env
+frontend/node_modules/
+frontend/build/
