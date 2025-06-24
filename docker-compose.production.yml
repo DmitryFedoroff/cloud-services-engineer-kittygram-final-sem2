@@ -1,0 +1,68 @@
+---
+version: "3.9"
+
+volumes:
+  pg_data:
+  static:
+  media:
+  frontend_build:
+
+services:
+  kitty_postgres:
+    image: postgres:13.10
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  kitty_backend:
+    image: dmitryfedoroff/kittygram_backend:latest
+    env_file: .env
+    restart: always
+    depends_on:
+      kitty_postgres:
+        condition: service_healthy
+    volumes:
+      - static:/app/collected_static/
+      - media:/app/media/
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c 'import socket,sys; s=socket.socket(); sys.exit(s.connect_ex((\"localhost\",9000)))'"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  kitty_frontend:
+    image: dmitryfedoroff/kittygram_frontend:latest
+    env_file: .env
+    restart: always
+    volumes:
+      - frontend_build:/app/build/
+
+  kitty_gateway:
+    image: dmitryfedoroff/kittygram_gateway:latest
+    ports:
+      - "80:80"
+    restart: always
+    volumes:
+      - frontend_build:/usr/share/nginx/html/
+      - static:/var/html/static/
+      - media:/var/html/media/
+    depends_on:
+      kitty_backend:
+        condition: service_started
+      kitty_frontend:
+        condition: service_started
