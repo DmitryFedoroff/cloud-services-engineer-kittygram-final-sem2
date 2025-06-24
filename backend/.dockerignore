@@ -1,0 +1,36 @@
+# === Python virtual environments ===
+venv/
+.env/
+*.env
+*.venv
+Pipfile.lock
+poetry.lock
+
+# === Python bytecode ===
+__pycache__/
+*.py[cod]
+*$py.class
+
+# === Django database ===
+db.sqlite3
+
+# === Static/media (optional: only if not needed in image) ===
+static/
+media/
+
+# === Git ===
+.git/
+.gitignore
+
+# === IDEs & editors ===
+.vscode/
+.idea/
+*.iml
+
+# === OS and editor noise ===
+.DS_Store
+Thumbs.db
+
+# === Docker-related ===
+Dockerfile
+docker-compose*.yml
